@@ -55,23 +55,39 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 
 
+<div id="set-global-variables" class="section level2">
+<h2>Set global variables</h2>
+<p>```r{set envionments} library(knitr)</p>
+<p>opts_chunk$set(echo=TRUE, results=‘asis’) ```</p>
+</div>
 <div id="loading-and-preprocessing-the-data" class="section level2">
 <h2>Loading and preprocessing the data</h2>
-<p><code>r{set working directory, echo = FALSE} setwd(&quot;Z:/Coursera/Data Science/05 - Repoducible Research/Week 2/Project 1/RepData_PeerAssessment1&quot;)</code> <code>r{read csv file, echo = TRUE} activity &lt;- read.csv(&quot;activity.csv&quot;)</code></p>
+<p>```r{set working directory, echo = FALSE}</p>
+<p>setwd(“Z:/Coursera/Data Science/05 - Repoducible Research/Week 2/Project 1/RepData_PeerAssessment1”)</p>
+<p>```</p>
+<p>```r{read csv file, echo = TRUE} if(!file.exists(‘activity.csv’)){ unzip(‘activity.zip’) } activity &lt;- read.csv(‘activity.csv’)</p>
+<p>activity<span class="math">\(date &lt;- as.Date(activity\)</span>date, “%Y-%m-%d”) ```</p>
 </div>
 <div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level2">
 <h2>What is mean total number of steps taken per day?</h2>
-<p><code>r{mean of total number of steps} mean(activity$steps, na.rm=TRUE)</code></p>
+<p>```r{mean of total number of steps} total.steps &lt;- with(activity,tapply(steps, date, sum, na.rm=TRUE)) total.mean &lt;- mean(total.steps) total.median &lt;- median(total.steps) library(ggplot2) qplot(total.steps, xlab=‘Total steps’, ylab=‘Frequency’, binwidth=1000) + geom_vline(xintercept = total.mean, colour=“red”) + geom_text(aes(x=total.mean, label=“”, y=1), colour=“red”, angle=90, text=element_text(size=12)) + geom_vline(xintercept = total.median, colour=“green”) + geom_text(aes(x=total.median, label=“”, y=1), colour=“green”, angle=90, text=element_text(size=12))</p>
+<p>```</p>
 </div>
 <div id="what-is-the-average-daily-activity-pattern" class="section level2">
 <h2>What is the average daily activity pattern?</h2>
-<p><code>r{average daily activity pattern} mean(activity$interval, na.rm=TRUE)</code></p>
+<p>```r{average daily activity pattern} average.steps &lt;- with(activity,tapply(steps, interval, mean, na.rm=TRUE))</p>
+<p>plot(row.names(average.steps), average.steps, type = “l”, xlab = “5-min interval”, ylab = “Average across all Days”, main = “Average number of steps taken”, col = “red”)</p>
+<p>max.interval &lt;- as.numeric(names(which.max(average.steps))) abline(v=max.interval,col=“blue”) mtext(side=3,line=-2,adj=1,&quot; – Max Interval“,col=”blue“) ```</p>
 </div>
 <div id="imputing-missing-values" class="section level2">
 <h2>Imputing missing values</h2>
 </div>
+<div id="how-many-missing" class="section level1">
+<h1>How many missing</h1>
+<p><code>r{missing steps} activity.missing &lt;- sum(is.na(activity$steps))</code></p>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+</div>
 </div>
 
 
