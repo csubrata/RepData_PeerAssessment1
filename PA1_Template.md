@@ -6,7 +6,8 @@ output:
 ---
 
 ## Set global variables and load required libraries
-```{r, set envionments}
+
+```r
 library(knitr)
 library(ggplot2)
 library(Hmisc)
@@ -15,36 +16,36 @@ opts_chunk$set(echo=TRUE, results='asis', fig.width=10)
 ```
 
 ## Loading and preprocessing the data
-```{r, set working directory, echo = FALSE}
 
-setwd("Z:/Coursera/Data Science/05 - Repoducible Research/Week 2/Project 1/RepData_PeerAssessment1")
-
-```
 
 Load the data.
-```{r, Load the data}
+
+```r
 if(!file.exists('activity.csv')){
     unzip('activity.zip')
 }
 activity <- read.csv('activity.csv')
-```	
+```
 
 Process/transform the data (if necessary) into a format suitable for your analysis
-```{r, Process/transform the data (if necessary) into a format suitable for your analysis}
+
+```r
 activity$date <- as.Date(activity$date, "%Y-%m-%d")
 ```
 
 
 ## What is mean total number of steps taken per day?
 Calculate the steps, mean and median total number of steps taken per day
-```{r, Calculate the steps, mean and median total number of steps taken per day}
+
+```r
 total.steps <- with(activity,tapply(steps, date, sum, na.rm=TRUE))
 total.mean <- mean(total.steps)
 total.median <- median(total.steps)
 ```
 
 Make a histogram of the total number of steps taken each day. The graph also shows mean and median. 
-```{r, Make a histogram of the total number of steps taken each day}
+
+```r
 qplot(total.steps, xlab='Total steps', ylab='Frequency', binwidth=1000) +
 geom_vline(xintercept = total.mean, colour="red") + 
 geom_text(aes(x=total.mean, label="\nMean", y=1), colour="red", angle=90, text=element_text(size=12)) +
@@ -52,17 +53,28 @@ geom_vline(xintercept = total.median, colour="green") +
 geom_text(aes(x=total.median, label="\nMedian", y=1), colour="green", angle=90, text=element_text(size=12)) 
 ```
 
+![plot of chunk Make a histogram of the total number of steps taken each day](figure/Make a histogram of the total number of steps taken each day-1.png) 
+
 Report the mean and median total number of steps taken per day
-```{r}
+
+```r
 print(paste('Mean = ', toString(total.mean)))
+```
+
+[1] "Mean =  9354.22950819672"
+
+```r
 print(paste('Median = ', toString(total.median)))
 ```
+
+[1] "Median =  10395"
 
 
 ## What is the average daily activity pattern?
 Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, 
 averaged across all days (y-axis)
-```{r, average daily activity pattern}
+
+```r
 average.steps <- with(activity,tapply(steps, interval, mean, na.rm=TRUE))
 
 plot(row.names(average.steps), average.steps, type = "l", xlab = "5-min interval", 
@@ -74,29 +86,37 @@ abline(v=max.interval,col="blue")
 mtext(side=3,line=-2,adj=1," -- Max Interval",col="blue")
 ```
 
+![plot of chunk average daily activity pattern](figure/average daily activity pattern-1.png) 
+
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r, Which 5-minute interval}
+
+```r
 max.interval
 ```
+
+[1] 835
 
 ## Imputing missing values
 
 # How many missing
 
 Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r, missing steps}
+
+```r
 activity.missing <- sum(is.na(activity))
 ```
 
 Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. 
 For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
-```{r, a strategy}
+
+```r
 activity.filled <- activity
 activity.filled$steps <- with(activity.filled, impute(steps, mean))
 ```
 
 Create a new dataset that is equal to the original dataset but with the missing data filled in.
-```{r, a new dataset}
+
+```r
 total.filled.steps <- with(activity.filled,tapply(steps, date, sum, na.rm=TRUE))
 ```
 
@@ -105,7 +125,8 @@ steps taken per day. Do these values differ from the estimates from the first pa
 of imputing missing data on the estimates of the total daily number of steps?
 
 The graph also shows mean and median. Interestingly, both mean and median are same.
-```{r}
+
+```r
 total.filled.mean <- mean(total.filled.steps)
 total.filled.median <- median(total.filled.steps)
 qplot(total.filled.steps, xlab='Total steps', ylab='Frequency', binwidth=1000) +
@@ -116,11 +137,14 @@ geom_text(aes(x=total.filled.median, label="\nMedian", y=1), colour="green", ang
           text=element_text(size=12)) 
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is 
 a weekday or weekend day.
-```{r}
+
+```r
 day.type <- function(date) {
     if (weekdays(date) %in% c('Saturday', 'Sunday')) {
         return('weekend')
@@ -136,9 +160,12 @@ activity.filled$daytype <- as.factor(day.types)
 Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number 
 of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to 
 see an example of what this plot should look like using simulated data.
-```{r}
+
+```r
 averages <- aggregate(steps ~ interval + daytype, data=activity.filled, mean)
 
 ggplot(averages, aes(interval, steps)) + geom_line(aes(color=daytype)) + facet_grid(daytype ~ .) + 
        xlab("5-minute interval") + ylab("Number of steps")
 ```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
